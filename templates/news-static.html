@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>每日新闻摘要</title>
+    <style>
+        #menu {
+            width: 960px;
+            min-height: 80px;
+            border-bottom: solid 1px lightskyblue;
+            margin: 10px auto 30px auto;
+            text-align: center;
+            line-height: 40px;
+            padding: 0 20px;
+            overflow: hidden;
+        }
+        #menu #logo {
+            width: 200px;
+            line-height: 80px;
+            float: left;
+            text-align: left;
+            font-size: 26px;
+        }
+        #menu #category {
+            width: auto;
+            float: right;
+            text-align: right;
+            line-height: 40px;
+            padding: 10px 0;
+        }
+        .news {
+            width: 960px;
+            min-height: 150px;
+            border: solid 1px lightgrey;
+            margin: 30px auto;
+            border-radius: 10px;
+        }
+        .headline {
+            width: 95%;
+            height: 30px;
+            border-bottom: solid 1px lightgrey;
+            padding: 15px;
+            margin: auto;
+        }
+        .title {
+            width: 70%;
+            height: 30px;
+            text-align: left;
+            float: left;
+            color: mediumslateblue;
+        }
+        .view {
+            width: 28%;
+            height: 30px;
+            text-align: right;
+            float: right;
+        }
+        .content {
+            width: 95%;
+            min-height: 30px;
+            text-align: left;
+            border: solid 0px lightgrey;
+            padding: 12px;
+            margin: auto;
+            margin-top: 10px;
+            font-size: 15px;
+        }
+        #history {
+            width: 940px;
+            min-height: 30px;
+            border: solid 1px lightgrey;
+            margin: 30px auto;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        #history .date {
+            margin: 0px 10px;
+        }
+        a:link, a:visited {
+            text-decoration: none;
+            color: #337ab7;
+        }
+        a:hover, a:active {
+            text-decoration: none;
+            color: #e56244;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <div id="logo">每日新闻摘要</div>
+        <div id="category">
+            <span style="margin-right: 50px">2025-05-11</span>
+            <a href="/read/hot">今日要闻</a>&nbsp;&nbsp;&nbsp;
+            <a href="/read/china">国内新闻</a>&nbsp;&nbsp;&nbsp;
+            <a href="/read/world">国际新闻</a>&nbsp;&nbsp;&nbsp;
+            <a href="/read/mil">军事新闻</a>&nbsp;&nbsp;&nbsp;
+            <a href="/read/finance">财经新闻</a>&nbsp;&nbsp;&nbsp;
+            <a href="/read/tech">科技新闻</a>&nbsp;&nbsp;&nbsp;
+            <a href="/read/ent">娱乐新闻</a>&nbsp;&nbsp;&nbsp;
+            <a href="/read/society">社会新闻</a>
+        </div>
+    </div>
+
+    <!-- 此处先暂时写一条静态数据，后续用Jinja2进行动态循环填充即可-->
+    <div class="news">
+        <div class="headline">
+            <div class="title">我国成功发射通信技术试验卫星十三号</div>
+            <div class="view"><a href="https://news.sina.com.cn/c/2024-12-03/doc-incyekxt4864636.shtml" target="_blank">查看原文</a></div>
+        </div>
+        <div class="content">我国于2024年12月3日使用长征三号乙运载火箭，在西昌卫星发射中心成功发射通信技术试验卫星十三号，该卫星将用于卫星通信、广播电视和数据传输等业务。此次发射是长征系列运载火箭的第549次飞行。</div>
+    </div>
+
+    <div class="news">
+        <div class="headline">
+            <div class="title">我国成功发射通信技术试验卫星十三号</div>
+            <div class="view"><a href="https://news.sina.com.cn/c/2024-12-03/doc-incyekxt4864636.shtml" target="_blank">查看原文</a></div>
+        </div>
+        <div class="content">我国于2024年12月3日使用长征三号乙运载火箭，在西昌卫星发射中心成功发射通信技术试验卫星十三号，该卫星将用于卫星通信、广播电视和数据传输等业务。此次发射是长征系列运载火箭的第549次飞行。</div>
+    </div>
+
+    <!-- 底部按照日期进行分组查询，获取某一天的新闻，后续由Jinja2进行动态填充-->
+    <div id="history">
+        <span class="date"><a href="/history/2025-05-15/hot">2025-05-15</a></span>
+        <span class="date"><a href="/history/2025-05-10/china">2025-05-10</a></span>
+    </div>
+</body>
+</html>
