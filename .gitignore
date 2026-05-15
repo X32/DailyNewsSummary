@@ -15,6 +15,7 @@ venv/
 
 # OS
 .DS_Store
+._*
 
 # Docker
 *.sql
