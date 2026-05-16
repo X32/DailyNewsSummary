@@ -2,6 +2,7 @@ fastapi
 uvicorn[standard]
 sqlmodel
 pymysql
+cryptography
 beautifulsoup4
 lxml
 openai
