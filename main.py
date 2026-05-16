@@ -20,14 +20,18 @@ def index(request: Request):
 
     today = time.strftime("%Y-%m-%d")
     news_list = get_news_by_dc(date=today)
-    return templates.TemplateResponse(request=request, name="news.html", context={"news_list": news_list, "date_list": date_list, "today": today})
+    response = templates.TemplateResponse(request=request, name="news.html", context={"news_list": news_list, "date_list": date_list, "today": today})
+    response.headers["Content-Type"] = "text/html; charset=utf-8"
+    return response
 
 @app.get('/{category}')
 def query_news(request: Request, category: str):
     today = time.strftime("%Y-%m-%d")
     news_list = get_news_by_dc(date=today, category=category)
-    return templates.TemplateResponse(request=request, name="news.html",
+    response = templates.TemplateResponse(request=request, name="news.html",
                 context={"news_list": news_list, "today": today})
+    response.headers["Content-Type"] = "text/html; charset=utf-8"
+    return response
 
 @app.get('/{date}/{category}')
 def query_news_dc(request: Request, date: str, category: str):
@@ -39,7 +43,9 @@ def query_news_dc(request: Request, date: str, category: str):
 
     today = date    # 将today变量更新为date参数的值，而非获取当天的日期
     news_list = get_news_by_dc(date=date, category=category)
-    return templates.TemplateResponse(request=request, name="news.html", context={"news_list": news_list, "date_list": date_list, "today": today})
+    response = templates.TemplateResponse(request=request, name="news.html", context={"news_list": news_list, "date_list": date_list, "today": today})
+    response.headers["Content-Type"] = "text/html; charset=utf-8"
+    return response
 
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0", port=8000)
