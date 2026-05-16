@@ -62,10 +62,10 @@ GitHub Actions  ──推送镜像──▶  Docker Hub  ◀──拉取镜像�
 
 如果服务器在国内，Docker Hub 访问慢，可以用：
 
-| 方案 | 适合场景 |
-|---|---|
+| 方案                                | 适合场景                                       |
+| ----------------------------------- | ---------------------------------------------- |
 | GitHub Container Registry (ghcr.io) | 不想额外注册账号，直接用 GitHub 自带的镜像仓库 |
-| 阿里云容器镜像服务 (ACR) | 服务器在国内，拉取速度更快 |
+| 阿里云容器镜像服务 (ACR)            | 服务器在国内，拉取速度更快                     |
 
 ## 第4步：服务器上发生了什么
 
@@ -100,14 +100,14 @@ GitHub Actions  ──推送镜像──▶  Docker Hub  ◀──拉取镜像�
 
 到仓库 **Settings → Secrets and variables → Actions** 添加：
 
-| Secret | 说明 |
-|---|---|
-| `DOCKERHUB_USERNAME` | Docker Hub 用户名 |
-| `DOCKERHUB_TOKEN` | Docker Hub Access Token（在 Docker Hub → Account Settings → Security 创建） |
-| `SERVER_HOST` | 服务器 IP 地址 |
-| `SERVER_USER` | SSH 用户名（如 `root`） |
-| `SERVER_SSH_KEY` | SSH 私钥内容（`cat ~/.ssh/id_rsa`） |
-| `SERVER_PORT` | SSH 端口（可选，默认 22） |
+| Secret                 | 说明                                                                          |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| `DOCKERHUB_USERNAME` | Docker Hub 用户名                                                             |
+| `DOCKERHUB_TOKEN`    | Docker Hub Access Token（在 Docker Hub → Account Settings → Security 创建） |
+| `SERVER_HOST`        | 服务器 IP 地址                                                                |
+| `SERVER_USER`        | SSH 用户名（如 `root`）                                                     |
+| `SERVER_SSH_KEY`     | SSH 私钥内容（`cat ~/.ssh/id_rsa`）                                         |
+| `SERVER_PORT`        | SSH 端口（可选，默认 22）                                                     |
 
 ## 服务器首次部署
 
@@ -126,6 +126,8 @@ bash deploy.sh
 ## 常用管理命令
 
 ```bash
+
+
 # 查看日志
 docker compose logs -f app
 
@@ -137,6 +139,21 @@ docker compose down
 
 # 停止并删除数据卷（重置数据库）
 docker compose down -v
+
+docker ps         
+   
+  查看所有容器（包括已停止的）： 
+ 
+
+  docker compose down -v      
+  docker compose up -d   
+docker compose restart app
+docker compose logs mysql             
+   
+  docker ps -a  
+
+docker compose down        
+  docker compose up -d   
 ```
 
 ## 回滚操作
@@ -153,9 +170,9 @@ DOCKER_TAG=abc123 docker compose up -d
 
 ## 为什么用 CI/CD + Docker
 
-| 方式 | 直接 SSH + git pull | CI/CD + Docker |
-|---|---|---|
-| 服务器需要装 Python 环境 | 是 | 不需要 |
-| 依赖版本不一致风险 | 有 | 没有（锁在镜像里） |
-| 代码有问题影响线上 | 可能 | 可以回滚（换旧 tag） |
-| 每次部署要手动操作 | 是 | push 即自动部署 |
+| 方式                     | 直接 SSH + git pull | CI/CD + Docker       |
+| ------------------------ | ------------------- | -------------------- |
+| 服务器需要装 Python 环境 | 是                  | 不需要               |
+| 依赖版本不一致风险       | 有                  | 没有（锁在镜像里）   |
+| 代码有问题影响线上       | 可能                | 可以回滚（换旧 tag） |
+| 每次部署要手动操作       | 是                  | push 即自动部署      |

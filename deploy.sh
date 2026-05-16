@@ -4,7 +4,7 @@
 
 set -e
 
-DEPLOY_DIR="/opt/dailynews"
+DEPLOY_DIR="/www/wwwroot/dailynews"
 
 echo "=== DailyNews 部署脚本 ==="
 
