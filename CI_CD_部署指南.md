@@ -193,9 +193,22 @@ docker ps
 
   docker exec -it 容器名或ID /bin/bash
 
+
+
+
+```bash
+docker ps
+CONTAINER ID   IMAGE                     COMMAND                  CREATED        STATUS                  PORTS                                                  NAMES
+5dbae365dc3a   x32sky/dailynews:latest   "./entrypoint.sh"        10 hours ago   Up 10 hours             0.0.0.0:8000->8000/tcp, :::8000->8000/tcp              dailynews-app
+dc4c906c960c   mysql:8.0                 "docker-entrypoint.s…"   10 hours ago   Up 10 hours (healthy)   33060/tcp, 0.0.0.0:3307->3306/tcp, :::3307->3306/tcp   dailynews-mysql
+[root@VM-24-7-opencloudos dailynews]# docker exec -it dailynews-app /bin/bash
+
+```
+
+
 # 如果容器没有 bash，用 sh
 
-  docker exec -it 容器名或ID /bin/sh
+  docker exec -it 容器名或ID /bin/s
 
   进入后就可以像在服务器上一样调试，比如：
 
@@ -295,3 +308,109 @@ docker ps
   所以本质就是：你 push 代码 → GitHub 自动拉起一台机器 →
   按你的配置跑脚本 → 完成部署。一切自动化，你只管写代码和
   push。
+
+
+本地 Bind Mount 热更新方案
+
+
+
+Bind Mount 热更新原理
+
+  ┌─────────────────────────────────────────────┐
+  │  你的 Mac 宿主机
+   │
+  │
+  │
+  │  /Volumes/H/python/DailyNews/DailyNews/
+  │
+  │  ├── main.py          ← 你在这里改代码
+   │
+  │  ├── crawler.py
+  │
+  │  └── templates/
+  │
+  │         │
+  │
+  │         │  Bind Mount ( volumes: .:/app )
+   │
+  │         │  不是复制，是直接映射目录
+    │
+  │         ▼
+  │
+  │  ┌─────────────────────────────┐
+  │
+  │  │  Docker 容器                 │
+   │
+  │  │  /app/                      │
+  │
+  │  │  ├── main.py  ← 同一个文件   │
+   │
+  │  │  ├── crawler.py             │
+  │
+  │  │  └── templates/             │
+  │
+  │  │                             │
+  │
+  │  │  uvicorn --reload 检测到     │
+   │
+  │  │  文件变化 → 自动重启          │
+    │
+  │  └─────────────────────────────┘
+  │
+  └─────────────────────────────────────────────┘
+
+  三个关键机制
+
+1. Bind Mount（目录映射）
+
+  volumes:
+    - .:/app
+
+  对比两种方式：
+
+- COPY（原方案）：构建时复制代码进镜像 →改代码必须重新 build
+- Bind Mount：把宿主机目录直接挂载到容器里 →
+  宿主机改了，容器里立刻看到
+
+  本质上就是 Linux 的 mount --bind，容器里的 /app
+   和宿主机的项目目录指向同一块磁盘空间。
+
+2. uvicorn --reload（文件监听）
+
+  uvicorn.run('main:app', host='0.0.0.0',
+  port=8000, reload=True)
+
+  reload=True 启动一个 watchfiles 进程，持续监听
+  /app 下的 .py 文件变化。检测到改动后自动重启
+  FastAPI 应用。
+
+3. Mac 上的特殊处理
+
+  Mac 的 Docker Desktop 运行在一个虚拟机里，Linux
+   的 inotify
+  文件系统事件传递不到容器内。所以需要：
+
+  WATCHFILES_FORCE_POLLING=true
+
+  让 watchfiles 改用轮询方式（定期扫描文件修改时
+  间），而不是依赖系统事件。稍慢一点但可靠。
+
+  数据流
+
+  你保存 main.py
+    │
+    ▼
+  宿主机磁盘上的 main.py 变更
+    │
+    ▼ (Bind Mount 是同一个文件，无需同步)
+    ▼
+  容器内 /app/main.py 变更
+    │
+    ▼ (watchfiles 轮询检测到)
+    ▼
+  uvicorn 自动重启 FastAPI
+    │
+    ▼
+  刷新浏览器看到新代码效果
+
+  整个过程大概 1-2 秒，不用重新构建镜像。

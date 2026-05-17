@@ -44,6 +44,7 @@ jobs:
         with:
           context: .
           push: true
+          no-cache: true
           tags: |
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
@@ -63,7 +64,7 @@ jobs:
           script: |
             cd /opt/dailynews
             docker compose pull app
-            docker compose up -d --remove-orphans
+            docker compose up -d --force-recreate --remove-orphans
             docker image prune -f
             echo "Deploy completed at $(date)"
 

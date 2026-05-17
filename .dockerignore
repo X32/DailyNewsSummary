@@ -20,3 +20,4 @@ test_llm.py
 *.egg-info
 dist/
 build/
+docker-compose.override.yml
