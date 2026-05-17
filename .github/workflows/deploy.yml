@@ -66,3 +66,61 @@ jobs:
             docker compose up -d --remove-orphans
             docker image prune -f
             echo "Deploy completed at $(date)"
+
+      - name: Notify Feishu on success
+        if: success()
+        run: |
+          SIGN=$(python3 -c "
+          import hmac, hashlib, base64, time
+          ts = str(int(time.time()))
+          s = '${{ secrets.FEISHU_WEBHOOK_SECRET }}'
+          sign = base64.b64encode(hmac.new(f'{ts}\n{s}'.encode(), digestmod=hashlib.sha256).digest()).decode()
+          print(f'{ts} {sign}')
+          ")
+          TIMESTAMP=$(echo "$SIGN" | cut -d' ' -f1)
+          SIGN=$(echo "$SIGN" | cut -d' ' -f2)
+          curl -s -X POST "${{ secrets.FEISHU_WEBHOOK_URL }}" \
+            -H 'Content-Type: application/json' \
+            -d "{
+              \"timestamp\": \"$TIMESTAMP\",
+              \"sign\": \"$SIGN\",
+              \"msg_type\": \"interactive\",
+              \"card\": {
+                \"header\": {
+                  \"title\": { \"tag\": \"plain_text\", \"content\": \"✅ DailyNews 部署成功\" },
+                  \"template\": \"green\"
+                },
+                \"elements\": [
+                  { \"tag\": \"div\", \"text\": { \"tag\": \"lark_md\", \"content\": \"**分支:** ${{ github.ref_name }}\n**提交:** ${{ github.sha }}\n**触发者:** ${{ github.actor }}\n**时间:** $(date '+%Y-%m-%d %H:%M:%S')\" } }
+                ]
+              }
+            }"
+
+      - name: Notify Feishu on failure
+        if: failure()
+        run: |
+          SIGN=$(python3 -c "
+          import hmac, hashlib, base64, time
+          ts = str(int(time.time()))
+          s = '${{ secrets.FEISHU_WEBHOOK_SECRET }}'
+          sign = base64.b64encode(hmac.new(f'{ts}\n{s}'.encode(), digestmod=hashlib.sha256).digest()).decode()
+          print(f'{ts} {sign}')
+          ")
+          TIMESTAMP=$(echo "$SIGN" | cut -d' ' -f1)
+          SIGN=$(echo "$SIGN" | cut -d' ' -f2)
+          curl -s -X POST "${{ secrets.FEISHU_WEBHOOK_URL }}" \
+            -H 'Content-Type: application/json' \
+            -d "{
+              \"timestamp\": \"$TIMESTAMP\",
+              \"sign\": \"$SIGN\",
+              \"msg_type\": \"interactive\",
+              \"card\": {
+                \"header\": {
+                  \"title\": { \"tag\": \"plain_text\", \"content\": \"❌ DailyNews 部署失败\" },
+                  \"template\": \"red\"
+                },
+                \"elements\": [
+                  { \"tag\": \"div\", \"text\": { \"tag\": \"lark_md\", \"content\": \"**分支:** ${{ github.ref_name }}\n**提交:** ${{ github.sha }}\n**触发者:** ${{ github.actor }}\n**时间:** $(date '+%Y-%m-%d %H:%M:%S')\" } }
+                ]
+              }
+            }"
