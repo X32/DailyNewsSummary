@@ -156,6 +156,8 @@ docker compose down
   docker compose up -d   
 ```
 
+## https://hub.docker.com/r/x32sky/dailynews，
+
 ## 回滚操作
 
 每次构建都有 git sha 标签，服务器上执行：
@@ -167,6 +169,22 @@ docker pull yourname/dailynews:abc123
 # 用旧版本启动
 DOCKER_TAG=abc123 docker compose up -d
 ```
+
+# 数据库重建在服务器上执行
+
+  docker compose down -v          #
+  停止服务并删除数据卷
+  docker compose up -d            #
+  重新启动（会用新的字符集重新初始化）
+
+  然后重新跑爬虫抓取数据：
+  docker compose exec app python crawler.py
+  docker compose exec app python summarize.py
+
+  总结：乱码的根本原因是 MySQL 8.0 默认字符集不是
+  UTF-8，需要通过 --character-set-server=utf8mb4
+  显式指定。加上之前 news.py 的 charset=utf8mb4
+  连接参数，两端就都统一了。
 
 ## 为什么用 CI/CD + Docker
 
